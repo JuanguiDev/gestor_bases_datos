@@ -362,34 +362,6 @@ app_bds/
 4. **Push** a la rama (`git push origin feature/nueva-funcionalidad`)
 5. **Crea un Pull Request**
 
-### Reportar Bugs
-Usa el archivo de diagnóstico y proporciona:
-- Versión de PHP y MySQL
-- Sistema operativo
-- Pasos para reproducir el error
-- Logs de error relevantes
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.
-
-## 📞 Soporte
-
-### Documentación Adicional
-- [Manual de MySQL](https://dev.mysql.com/doc/)
-- [Documentación de PHP PDO](https://www.php.net/manual/en/book.pdo.php)
-- [Bootstrap 5 Docs](https://getbootstrap.com/docs/5.0/)
-
-### Versión
-**v2.0.0** - Diciembre 2024
-- Soporte para conexiones remotas
-- Manejo avanzado de caracteres especiales
-- Interfaz mejorada
-- Mejor sistema de diagnóstico
-- Medidas de seguridad reforzadas
-
----
-
 Desarrollado con ❤️ para facilitar la gestión de múltiples bases de datos MySQL.
 
 La aplicación incluye medidas de seguridad básicas:
@@ -403,50 +375,6 @@ La aplicación incluye medidas de seguridad básicas:
 - No uses esta aplicación en producción sin autenticación
 - Implementa HTTPS en entornos públicos
 - Realiza copias de seguridad antes de ejecutar consultas masivas
-
-## 🚨 Solución de Problemas
-
-### Error de conexión
-- Verifica que MySQL esté ejecutándose
-- Confirma usuario y contraseña
-- Revisa el puerto (3306 por defecto)
-
-### Permisos insuficientes
-```sql
--- Crear usuario con permisos (ejecutar como root)
-CREATE USER 'app_user'@'localhost' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON *.* TO 'app_user'@'localhost';
-FLUSH PRIVILEGES;
-```
-
-### Consultas lentas
-- Revisa índices en las tablas
-- Limita resultados con `LIMIT`
-- Usa `EXPLAIN` para analizar consultas
-
-## 🔄 Actualizaciones Futuras
-
-Funcionalidades planificadas:
-- [ ] Exportar/importar consultas
-- [ ] Historial de consultas
-- [ ] Backup automático
-- [ ] Múltiples conexiones simultáneas
-- [ ] Editor SQL con syntax highlighting
-- [ ] Gráficos de rendimiento
-
-## 💡 Consejos de Uso
-
-1. **Prueba primero**: Ejecuta consultas en una sola BD antes de aplicarlas a múltiples
-2. **Respaldos**: Siempre haz backup antes de consultas que modifiquen datos
-3. **Índices**: Crea índices apropiados para consultas frecuentes
-4. **Monitoreo**: Revisa los logs de MySQL para detectar problemas
-
-## 🤝 Contribución
-
-Si encuentras bugs o tienes sugerencias:
-1. Documenta el problema claramente
-2. Incluye pasos para reproducir el error
-3. Propón soluciones si es posible
 
 ---
 
