@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Bases de Datos Múltiples</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-database me-2"></i>
+                Gestor de BD Múltiples
+            </a>
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item" id="sessionInfo" style="display: none;">
+                    <span class="navbar-text me-3">
+                        <i class="fas fa-user me-1"></i>
+                        <span id="connectedUser">Usuario</span>
+                        <small class="text-light">@<span id="connectedServer">servidor</span></small>
+                    </span>
+                </div>
+                <div class="nav-item">
+                    <button class="btn btn-outline-light btn-sm" id="refreshBtn" style="display: none;" onclick="dbManager.refreshData()">
+                        <i class="fas fa-sync-alt me-1"></i>
+                        Actualizar
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm ms-2" id="logoutBtn" style="display: none;" onclick="dbManager.logout()">
+                        <i class="fas fa-sign-out-alt me-1"></i>
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Panel de Notificaciones -->
+        <div id="notificationPanel" class="alert alert-info fade show" style="display: none;">
+            <div class="d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm me-2" id="notificationSpinner" style="display: none;"></div>
+                <i class="fas fa-info-circle me-2" id="notificationIcon"></i>
+                <span id="notificationText">Mensaje de notificación</span>
+                <button type="button" class="btn-close ms-auto" onclick="dbManager.hideNotification()"></button>
+            </div>
+        </div>
+
+        <!-- Panel de Conexión -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plug me-2"></i>
+                            Configuración de Conexión
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="connectionForm">
+                            <div class="mb-3">
+                                <label for="host" class="form-label">Servidor</label>
+                                <input type="text" class="form-control" id="host" value="localhost" placeholder="localhost, 127.0.0.1, o IP remota">
+                                <div class="form-text">Puedes usar localhost, 127.0.0.1, o cualquier IP remota</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label">Usuario</label>
+                                        <input type="text" class="form-control" id="username" value="root" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="port" class="form-label">Puerto</label>
+                                        <input type="number" class="form-control" id="port" value="3306" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="password" placeholder="Dejar vacío para XAMPP por defecto">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-link me-2"></i>
+                                Conectar a Servidor MySQL
+                            </button>
+                        </form>
+                        <div id="connectionStatus" class="mt-3"></div>
+                    </div>
+                </div>
+
+                <!-- Panel de Creación de BD -->
+                <div class="card shadow mt-4" id="createDbPanel" style="display: none;">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plus me-2"></i>
+                            Crear Base de Datos
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="createDbForm">
+                            <div class="mb-3">
+                                <label for="newDbName" class="form-label">Nombre de la BD</label>
+                                <input type="text" class="form-control" id="newDbName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="charset" class="form-label">Charset</label>
+                                <select class="form-select" id="charset">
+                                    <option value="utf8mb4">utf8mb4</option>
+                                    <option value="utf8">utf8</option>
+                                    <option value="latin1">latin1</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-plus me-2"></i>
+                                Crear BD
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Bases de Datos -->
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            Bases de Datos Disponibles
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="databasesContainer">
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-database fa-3x mb-3"></i>
+                                <p>Conecta al servidor para ver las bases de datos disponibles</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de Consultas -->
+                <div class="card shadow mt-4" id="queryPanel" style="display: none;">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-code me-2"></i>
+                            Ejecutar Consulta en BD Seleccionadas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="queryType" class="form-label">Tipo de Consulta</label>
+                                <select class="form-select mb-3" id="queryType">
+                                    <option value="select">SELECT</option>
+                                    <option value="insert">INSERT</option>
+                                    <option value="update">UPDATE</option>
+                                    <option value="delete">DELETE</option>
+                                    <option value="create">CREATE TABLE</option>
+                                    <option value="alter">ALTER TABLE</option>
+                                    <option value="drop">DROP TABLE</option>
+                                    <option value="dropdatabase" class="text-danger">DROP DATABASE</option>
+                                    <option value="custom">Consulta Personalizada</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">BD Seleccionadas</label>
+                                <div id="selectedDbsDisplay" class="form-control-plaintext bg-light p-2 rounded">
+                                    Ninguna base seleccionada
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="sqlQuery" class="form-label">Consulta SQL</label>
+                            <textarea class="form-control" id="sqlQuery" rows="6" placeholder="Escribe tu consulta SQL aquí..."></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-warning w-100" id="executeQuery">
+                                    <i class="fas fa-play me-2"></i>
+                                    Ejecutar en BD Seleccionadas
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-secondary w-100" id="clearQuery">
+                                    <i class="fas fa-eraser me-2"></i>
+                                    Limpiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de Resultados -->
+                <div class="card shadow mt-4" id="resultsPanel" style="display: none;">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Resultados de la Consulta
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="resultsContainer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Indicador de estado de conexión -->
+    <div id="connectionBadge" class="connection-badge disconnected" style="display: none;">
+        <i class="fas fa-circle me-1"></i>
+        <span id="connectionBadgeText">Desconectado</span>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Acción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="confirmExecute">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
